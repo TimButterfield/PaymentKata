@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 using ClearBank.DeveloperTest.Types;
 using FluentAssertions;
 using Xunit;
@@ -13,10 +13,41 @@ public class BacsPaymentSchemeStrategyTests
     {
         var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs}; 
         var sut = GetSut();
+        var isValidRequest = sut.ValidateRequest(paymentRequest, account:null);
+        isValidRequest.Success.Should().BeFalse(); 
+    }
+    
+    [Fact]
+    public void WhenAccountAndPaymentIsBacs_ThenPaymentResultIsSuccessful()
+    {
+        var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs}; 
+        var sut = GetSut();
         var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs });
         isValidRequest.Success.Should().BeTrue(); 
     }
-
+    
+    [Theory]
+    [InlineData(AllowedPaymentSchemes.Chaps)]
+    [InlineData(AllowedPaymentSchemes.FasterPayments)]
+    public void WhenAccountIsNotBacs_ThenPaymentResultIsUnsuccessful(AllowedPaymentSchemes allowedPaymentSchemes)
+    {
+        var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs}; 
+        var sut = GetSut();
+        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = allowedPaymentSchemes });
+        isValidRequest.Success.Should().BeFalse(); 
+    }
+    
+    [Theory]
+    [InlineData(PaymentScheme.Chaps)]
+    [InlineData(PaymentScheme.FasterPayments)]
+    public void WhenPaymentRequestIsNotBacs_ThenPaymentResultIsUnsuccessful(PaymentScheme paymentScheme)
+    {
+        var paymentRequest = new MakePaymentRequest { PaymentScheme = paymentScheme}; 
+        var sut = GetSut();
+        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs });
+        isValidRequest.Success.Should().BeFalse(); 
+    }
+   
     private BacsPaymentStrategy GetSut()
     {
         return new BacsPaymentStrategy(); 
@@ -30,18 +61,10 @@ public class BacsPaymentStrategy : IPaymentStrategy
     
     public MakePaymentResult ValidateRequest(MakePaymentRequest paymentRequest, Account account)
     {
-        if (!Applies(paymentRequest))
-        {
-            return new MakePaymentResult {Success= false};
-        }
+        var accountIsNull = account == null;
+        bool AccountIsNotBacs () => !account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs); 
         
-        //Ths can be further refactored
-        if (account == null)
-        {
-            return new MakePaymentResult {Success= false};
-        }
-
-        if (!account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs))
+        if (!Applies(paymentRequest) || accountIsNull || AccountIsNotBacs())
         {
             return new MakePaymentResult {Success= false};
         }
