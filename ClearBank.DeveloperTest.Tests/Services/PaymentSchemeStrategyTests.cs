@@ -31,4 +31,22 @@ public class PaymentSchemeStrategyTests
         selectedPaymentStrategy.Should().BeOfType(type);
 
     }
+    
+    [Fact]
+    public void WhenSelectingAStrategyForANoneExistentScheme_ThenNoStrategyIsSelected()
+    {
+        var paymentSchemeStrategy = new List<IPaymentStrategy>
+        {
+            new BacsPaymentStrategy(), 
+            new FasterPaymentsPaymentStrategy(), 
+            new ChapsPaymentsPaymentStrategy()
+        };
+
+        var paymentRequest = new MakePaymentRequest { PaymentScheme = (PaymentScheme)1000 };
+
+        var selectedPaymentStrategy = paymentSchemeStrategy.FirstOrDefault(x => x.Applies(paymentRequest));
+
+        selectedPaymentStrategy.Should().BeNull();
+
+    }
 }
