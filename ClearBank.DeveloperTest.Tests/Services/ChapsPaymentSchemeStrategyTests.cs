@@ -18,18 +18,27 @@ public class ChapsPaymentSchemeStrategyTests
 
    
     [Fact]
-    public void WhenAccountAndPaymentIsChapsPayments_ThenPaymentResultIsSuccessful()
+    public void WhenAccountIsLiveAndPaymentIsChapsPayment_ThenPaymentResultIsSuccessful()
     {
         var paymentRequest =  GetPaymentRequest(PaymentScheme.Chaps); 
         var sut = GetSut();
-        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps, Status = AccountStatus.Live });
         isValidRequest.Success.Should().BeTrue(); 
+    }
+    
+    [Fact]
+    public void WhenAccountAndPaymentIsChapsPayment_ButNotLive_ThenPaymentResultIsSuccessful()
+    {
+        var paymentRequest =  GetPaymentRequest(PaymentScheme.Chaps); 
+        var sut = GetSut();
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps, Status = AccountStatus.Disabled});
+        isValidRequest.Success.Should().BeFalse(); 
     }
     
     [Theory]
     [InlineData(AllowedPaymentSchemes.FasterPayments)]
     [InlineData(AllowedPaymentSchemes.Bacs)]
-    public void WhenAccountIsNotFasterPayment_ThenPaymentResultIsUnsuccessful(AllowedPaymentSchemes allowedPaymentSchemes)
+    public void WhenAccountIsNotChapsPayment_ThenPaymentResultIsUnsuccessful(AllowedPaymentSchemes allowedPaymentSchemes)
     {
         var paymentRequest =  GetPaymentRequest(PaymentScheme.Chaps); 
         var sut = GetSut();
@@ -40,7 +49,7 @@ public class ChapsPaymentSchemeStrategyTests
     [Theory]
     [InlineData(PaymentScheme.FasterPayments)]
     [InlineData(PaymentScheme.Bacs)]
-    public void WhenPaymentRequestIsNotFasterPayments_ThenPaymentResultIsUnsuccessful(PaymentScheme paymentScheme)
+    public void WhenPaymentRequestIsNotChapsPayment_ThenPaymentResultIsUnsuccessful(PaymentScheme paymentScheme)
     {
         var paymentRequest = GetPaymentRequest(paymentScheme);
         var sut = GetSut();

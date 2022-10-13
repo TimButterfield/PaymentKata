@@ -7,6 +7,8 @@ namespace ClearBank.DeveloperTest.Tests.Services;
 
 public class FasterPaymentSchemeStrategyTests
 {
+    const int Balance = 100;
+    
     [Fact]
     public void WhenAccountIsNull_ThenPaymentResultIsUnsuccessful()
     {
@@ -22,8 +24,29 @@ public class FasterPaymentSchemeStrategyTests
     {
         var paymentRequest =  GetPaymentRequest(PaymentScheme.FasterPayments); 
         var sut = GetSut();
-        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.FasterPayments });
+        var account = new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.FasterPayments }
+            .WithBalance(Balance);
+        
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, account);
         isValidRequest.Success.Should().BeTrue(); 
+    }
+
+    [Fact] 
+    public void WhenAccountAndPaymentIsFasterPayments_AndBalanceIsLessThanPaymentAmount_ThenPaymentResultIsSuccessful()
+    {   var paymentAmount = Balance * 2;
+        var paymentRequest =  GetPaymentRequest(PaymentScheme.FasterPayments); 
+        paymentRequest.Amount = paymentAmount;
+        var sut = GetSut();
+        
+        
+        var account = new Account
+            {
+                AllowedPaymentSchemes = AllowedPaymentSchemes.FasterPayments
+            }
+            .WithBalance(Balance);
+        
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, account);
+        isValidRequest.Success.Should().BeFalse(); 
     }
     
     [Theory]
@@ -50,7 +73,7 @@ public class FasterPaymentSchemeStrategyTests
     
     private static MakePaymentRequest GetPaymentRequest(PaymentScheme paymentScheme)
     {
-        return new MakePaymentRequest { PaymentScheme = paymentScheme};
+        return new MakePaymentRequest { PaymentScheme = paymentScheme, Amount = Balance / 2};
     }
 
    

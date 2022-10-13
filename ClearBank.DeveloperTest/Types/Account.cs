@@ -1,5 +1,7 @@
 ﻿namespace ClearBank.DeveloperTest.Types
 {
+    //This could be refactored. Imagine an account can be set up in an invalid state
+    //But don't know the rules on what's valid
     public class Account
     {
         public string AccountNumber { get; set; }
