@@ -6,5 +6,5 @@ public interface IPaymentStrategy
 {
     bool Applies(MakePaymentRequest paymentRequest);
 
-    MakePaymentResult ValidateRequest(MakePaymentRequest paymentRequest, Account account);
+    MakePaymentResult ValidatePaymentRequest(MakePaymentRequest paymentRequest, Account account);
 }

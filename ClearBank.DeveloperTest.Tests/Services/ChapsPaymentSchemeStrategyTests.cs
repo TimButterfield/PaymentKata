@@ -12,7 +12,7 @@ public class ChapsPaymentSchemeStrategyTests
     {
         var paymentRequest = GetPaymentRequest(PaymentScheme.Chaps); 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, account:null);
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, account:null);
         isValidRequest.Success.Should().BeFalse(); 
     }
 
@@ -22,7 +22,7 @@ public class ChapsPaymentSchemeStrategyTests
     {
         var paymentRequest =  GetPaymentRequest(PaymentScheme.Chaps); 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps });
         isValidRequest.Success.Should().BeTrue(); 
     }
     
@@ -33,7 +33,7 @@ public class ChapsPaymentSchemeStrategyTests
     {
         var paymentRequest =  GetPaymentRequest(PaymentScheme.Chaps); 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = allowedPaymentSchemes });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = allowedPaymentSchemes });
         isValidRequest.Success.Should().BeFalse(); 
     }
     
@@ -44,7 +44,7 @@ public class ChapsPaymentSchemeStrategyTests
     {
         var paymentRequest = GetPaymentRequest(paymentScheme);
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Chaps });
         isValidRequest.Success.Should().BeFalse(); 
     }
     

@@ -21,7 +21,7 @@ public class PaymentServiceTests
         var dataStore = Substitute.For<IDataStore>();
         var paymentStrategy = Substitute.For<IPaymentStrategy>();
         paymentStrategy.Applies(Arg.Any<MakePaymentRequest>()).Returns(true); 
-        paymentStrategy.ValidateRequest(Arg.Any<MakePaymentRequest>(), Arg.Any<Account>()).Returns(new MakePaymentResult{Success = false}); 
+        paymentStrategy.ValidatePaymentRequest(Arg.Any<MakePaymentRequest>(), Arg.Any<Account>()).Returns(new MakePaymentResult{Success = false}); 
             
         var sut = new PaymentService(dataStore, GetPaymentStrategies(paymentStrategy));
         
@@ -48,7 +48,7 @@ public class PaymentServiceTests
         
         dataStore.GetAccount(Arg.Any<string>()).Returns(account);
         paymentStrategy.Applies(Arg.Any<MakePaymentRequest>()).Returns(true); 
-        paymentStrategy.ValidateRequest(Arg.Any<MakePaymentRequest>(), Arg.Any<Account>()).Returns(new MakePaymentResult{Success = true}); 
+        paymentStrategy.ValidatePaymentRequest(Arg.Any<MakePaymentRequest>(), Arg.Any<Account>()).Returns(new MakePaymentResult{Success = true}); 
         
         var sut = new PaymentService(dataStore, GetPaymentStrategies(paymentStrategy));
         var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs, DebtorAccountNumber =  DebtorAccountNumber, Amount = PaymentAmount};

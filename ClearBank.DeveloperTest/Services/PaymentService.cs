@@ -25,7 +25,7 @@ namespace ClearBank.DeveloperTest.Services
             
             if (strategy != null)
             {
-                result = strategy.ValidateRequest(request, account); 
+                result = strategy.ValidatePaymentRequest(request, account); 
             }
 
             if (result.Success)

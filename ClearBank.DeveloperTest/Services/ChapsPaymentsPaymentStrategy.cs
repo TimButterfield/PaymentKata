@@ -6,7 +6,7 @@ public class ChapsPaymentsPaymentStrategy : IPaymentStrategy
 {
     public bool Applies(MakePaymentRequest paymentRequest) => paymentRequest.PaymentScheme == PaymentScheme.Chaps;
     
-    public MakePaymentResult ValidateRequest(MakePaymentRequest paymentRequest, Account account)
+    public MakePaymentResult ValidatePaymentRequest(MakePaymentRequest paymentRequest, Account account)
     {
         var accountIsNull = account == null;
         bool AccountIsNotChapsPayments () => !account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Chaps); 

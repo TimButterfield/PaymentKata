@@ -6,7 +6,7 @@ public class FasterPaymentsPaymentStrategy : IPaymentStrategy
 {
     public bool Applies(MakePaymentRequest paymentRequest) => paymentRequest.PaymentScheme == PaymentScheme.FasterPayments;
     
-    public MakePaymentResult ValidateRequest(MakePaymentRequest paymentRequest, Account account)
+    public MakePaymentResult ValidatePaymentRequest(MakePaymentRequest paymentRequest, Account account)
     {
         var accountIsNull = account == null;
         bool AccountIsNotFasterPayments () => !account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.FasterPayments); 

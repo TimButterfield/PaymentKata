@@ -12,7 +12,7 @@ public class BacsPaymentSchemeStrategyTests
     {
         var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs}; 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, account:null);
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, account:null);
         isValidRequest.Success.Should().BeFalse(); 
     }
     
@@ -21,7 +21,7 @@ public class BacsPaymentSchemeStrategyTests
     {
         var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs}; 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs });
         isValidRequest.Success.Should().BeTrue(); 
     }
     
@@ -32,7 +32,7 @@ public class BacsPaymentSchemeStrategyTests
     {
         var paymentRequest = new MakePaymentRequest { PaymentScheme = PaymentScheme.Bacs}; 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = allowedPaymentSchemes });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = allowedPaymentSchemes });
         isValidRequest.Success.Should().BeFalse(); 
     }
     
@@ -43,7 +43,7 @@ public class BacsPaymentSchemeStrategyTests
     {
         var paymentRequest = new MakePaymentRequest { PaymentScheme = paymentScheme}; 
         var sut = GetSut();
-        var isValidRequest = sut.ValidateRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs });
+        var isValidRequest = sut.ValidatePaymentRequest(paymentRequest, new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs });
         isValidRequest.Success.Should().BeFalse(); 
     }
    
