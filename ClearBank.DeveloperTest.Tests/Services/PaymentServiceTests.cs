@@ -15,7 +15,7 @@ public class PaymentServiceTests
     const string DebtorAccountNumber = "123456789";
     
     [Fact]
-    private void WhenRequestIsNotValid_ThenAccountIsNotUpdated()
+    private void WhenPaymentRequestIsNotValid_ThenAccountIsNotUpdated()
     {
         //arrange
         var dataStore = Substitute.For<IDataStore>();
@@ -37,13 +37,16 @@ public class PaymentServiceTests
     }
     
     [Fact]
-    private void WhenMakingAValidPayment_AndAccountFound()
+    private void WhenPaymentRequestIsValid_AndAccountFound_ThenBalanceIsUpdated()
     {
         //arrange
         var expectedBalance = Balance - PaymentAmount;
         var dataStore = Substitute.For<IDataStore>();
         var paymentStrategy = Substitute.For<IPaymentStrategy>();
-        dataStore.GetAccount(Arg.Any<string>()).Returns(new Account{AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs, Balance = Balance});
+        var account = new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs }
+            .WithBalance(Balance); 
+        
+        dataStore.GetAccount(Arg.Any<string>()).Returns(account);
         paymentStrategy.Applies(Arg.Any<MakePaymentRequest>()).Returns(true); 
         paymentStrategy.ValidateRequest(Arg.Any<MakePaymentRequest>(), Arg.Any<Account>()).Returns(new MakePaymentResult{Success = true}); 
         
@@ -55,33 +58,33 @@ public class PaymentServiceTests
 
         //assert
         dataStore.Received(1).GetAccount(DebtorAccountNumber);
-        dataStore.Received().UpdateAccount(Arg.Is<Account>(x => x.Balance == expectedBalance));
+        dataStore.Received(1).UpdateAccount(Arg.Is<Account>(x => x.Balance == expectedBalance));
         result.Success.Should().BeTrue();
     }
     
-    //This test demonstrates a bug in the code, caused by default sucess state of true. 
+    //This test demonstrates a bug in the code, caused by default success state of true. 
     //Need to see it's desired behaviour before removing!
     [Fact]
-    private void WhenPaymentSchemeIsNotInRange_ThenResultIsTrue()
+    private void WhenPaymentSchemeIsNotInRange_ThenBalancesIsStillUpdated()
     {
-        const string debtorAccountNumber = "123456789";
-        
         var invalidPaymentScheme = (PaymentScheme)10;
         var dataStore = Substitute.For<IDataStore>();
         var expectedBalance = Balance - PaymentAmount;
-       
-        dataStore.GetAccount(Arg.Any<string>()).Returns(new Account{AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs, Balance = Balance});
+        var account = new Account { AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs }
+            .WithBalance(Balance); 
+        
+        dataStore.GetAccount(Arg.Any<string>()).Returns(account);
         var paymentStrategy = Substitute.For<IPaymentStrategy>();
         paymentStrategy.Applies(Arg.Any<MakePaymentRequest>()).Returns(false);
         
         var sut = new PaymentService(dataStore, GetPaymentStrategies(paymentStrategy));
-        var paymentRequest = new MakePaymentRequest { PaymentScheme = invalidPaymentScheme, DebtorAccountNumber =  debtorAccountNumber, Amount = PaymentAmount};
+        var paymentRequest = new MakePaymentRequest { PaymentScheme = invalidPaymentScheme, DebtorAccountNumber =  DebtorAccountNumber, Amount = PaymentAmount};
         
         //act
         var result = sut.MakePayment(paymentRequest);
 
-        dataStore.Received(1).GetAccount(debtorAccountNumber);
-        dataStore.Received().UpdateAccount(Arg.Is<Account>(x => x.Balance == expectedBalance));
+        dataStore.Received(1).GetAccount(DebtorAccountNumber);
+        dataStore.Received(1).UpdateAccount(Arg.Is<Account>(x => x.Balance == expectedBalance));
         result.Success.Should().BeTrue();
     }
 

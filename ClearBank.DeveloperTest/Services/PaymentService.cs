@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ClearBank.DeveloperTest.Data;
 using ClearBank.DeveloperTest.Types;
-using System.Configuration;
 using System.Linq;
 
 namespace ClearBank.DeveloperTest.Services
@@ -16,9 +15,10 @@ namespace ClearBank.DeveloperTest.Services
             _dataStore = dataStore;
             _paymentStrategies = paymentStrategies;
         }
-
+ 
         public MakePaymentResult MakePayment(MakePaymentRequest request)
         {
+            //TODO : Discuss this, default success of true. Is this really desired behaviour
             var result = new MakePaymentResult { Success = true };
             var account = _dataStore.GetAccount(request.DebtorAccountNumber);
             var strategy = _paymentStrategies.FirstOrDefault(x => x.Applies(request));
@@ -30,7 +30,7 @@ namespace ClearBank.DeveloperTest.Services
 
             if (result.Success)
             {
-                account.Balance -= request.Amount;
+                account.DeductPayment(request.Amount);
 
                 _dataStore.UpdateAccount(account);
             }
