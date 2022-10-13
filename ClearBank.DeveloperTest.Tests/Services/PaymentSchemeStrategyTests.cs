@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ClearBank.DeveloperTest.Services;
 using ClearBank.DeveloperTest.Types;
 using FluentAssertions;
@@ -16,16 +17,10 @@ public class PaymentSchemeStrategyTests
     [InlineData(PaymentScheme.Chaps, typeof(ChapsPaymentsPaymentStrategy))]
     public void WhenSelectingTheRightStrategy_ThenTheRightStrategyIsSelected(PaymentScheme paymentScheme, Type type)
     {
-        var paymentSchemeStrategy = new List<IPaymentStrategy>
-        {
-            new BacsPaymentStrategy(), 
-            new FasterPaymentsPaymentStrategy(), 
-            new ChapsPaymentsPaymentStrategy()
-        };
-
+        var paymentStrategies = GetPaymentStrategies();
         var paymentRequest = new MakePaymentRequest { PaymentScheme = paymentScheme };
 
-        var selectedPaymentStrategy = paymentSchemeStrategy.FirstOrDefault(x => x.Applies(paymentRequest));
+        var selectedPaymentStrategy = paymentStrategies.FirstOrDefault(x => x.Applies(paymentRequest));
 
         selectedPaymentStrategy.Should().NotBeNull();
         selectedPaymentStrategy.Should().BeOfType(type);
@@ -35,18 +30,25 @@ public class PaymentSchemeStrategyTests
     [Fact]
     public void WhenSelectingAStrategyForANoneExistentScheme_ThenNoStrategyIsSelected()
     {
-        var paymentSchemeStrategy = new List<IPaymentStrategy>
-        {
-            new BacsPaymentStrategy(), 
-            new FasterPaymentsPaymentStrategy(), 
-            new ChapsPaymentsPaymentStrategy()
-        };
-
+        
+        var paymentStrategies = GetPaymentStrategies();
         var paymentRequest = new MakePaymentRequest { PaymentScheme = (PaymentScheme)1000 };
 
-        var selectedPaymentStrategy = paymentSchemeStrategy.FirstOrDefault(x => x.Applies(paymentRequest));
+        var selectedPaymentStrategy = paymentStrategies.FirstOrDefault(x => x.Applies(paymentRequest));
 
         selectedPaymentStrategy.Should().BeNull();
 
+    }
+
+    private static IEnumerable<IPaymentStrategy> GetPaymentStrategies()
+    {
+        //Consider using reflection
+        var paymentStrategies = new List<IPaymentStrategy>
+        {
+            new BacsPaymentStrategy(),
+            new FasterPaymentsPaymentStrategy(),
+            new ChapsPaymentsPaymentStrategy()
+        };
+        return paymentStrategies;
     }
 }
