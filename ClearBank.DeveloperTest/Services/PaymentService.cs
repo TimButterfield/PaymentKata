@@ -30,12 +30,16 @@ namespace ClearBank.DeveloperTest.Services
 
             if (result.Success)
             {
-                account.DeductPayment(request.Amount);
-
-                _dataStore.UpdateAccount(account);
+                ProcessPayment(request, account);
             }
 
             return result;
+        }
+
+        private void ProcessPayment(MakePaymentRequest request, Account account)
+        {
+            account.DeductPayment(request.Amount);
+            _dataStore.UpdateAccount(account);
         }
     }
 }
